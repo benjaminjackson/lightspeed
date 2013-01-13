@@ -26,7 +26,7 @@
         var wpm = prompt("How many WPM? (default: 200)");
         if (!wpm) { wpm = 200; };
         $.getJSON(api_url + "?token=" + token + "&url=" + encodeURIComponent(window.location) + "&callback=?", function(response) {
-            $('div#lightspeed-text').text("Click to Start Reading");
+            $("div#lightspeed-text").text("Click to Start Reading");
             words = [];
             var regex = /([^\s]+)\s+/g;
             var matched = null;
@@ -44,13 +44,13 @@
                     }
                     else {
                         interval = setInterval(function() {
-                            $('div#lightspeed-text').text(words.shift());
+                            $("div#lightspeed-text").text(words.shift());
                         }, 60000/wpm);
                     }
                 });
     			$("#lightspeed").dblclick(function(event){
     				$("#lightspeed").fadeOut(750);
-    				setTimeout("$('#lightspeed').remove()", 750);
+    				setTimeout("$(\"#lightspeed\").remove()", 750);
     			});
             }
         });
@@ -60,11 +60,11 @@
 		(window.lightspeed = function() {
 			if ($("#lightspeed").length == 0) {
 				$("body").append("\
-				<div id='lightspeed'>\
-                    <div id='lightspeed-text'>\
+				<div id=\"lightspeed\">\
+                    <div id=\"lightspeed-text\">\
                     Loading...\
                     </div>\
-					<style type='text/css'>\
+					<style type=\"text/css\">\
                     div#lightspeed {\
                         position: fixed;\
                         top: 0;\
@@ -89,7 +89,7 @@
 				$("#lightspeed").fadeIn(750);
 			} else {
 				$("#lightspeed").fadeOut(750);
-				setTimeout("$('#lightspeed').remove()", 750);
+				setTimeout("$(\"#lightspeed\").remove()", 750);
 			}
 		})();
 	}
