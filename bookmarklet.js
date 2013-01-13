@@ -1,6 +1,8 @@
 (function(){
 
-	var v = "1.3.2";
+	var v = "1.8.1";
+    var api_url = "http://www.diffbot.com/api/article";
+    var token = "c18e3a38cc8d02843975ae738beb668f";
 
 	if (window.jQuery === undefined || window.jQuery.fn.jquery < v) {
 		var done = false;
@@ -16,29 +18,22 @@
 	} else {
 		initBookmarklet();
 	}
+    
+    function initBookmarklet() {
+        $.getJSON(api_url + "?token=" + token + "&url=" + encodeURIComponent(window.location) + "&callback=?", function(response) {
+            parseText(response.text);
+        });
+    };
 	
-	function initBookmarklet() {
+	function parseText(text) {
 		(window.lightspeed = function() {
-			function getSelText() {
-				var s = '';
-				if (window.getSelection) {
-					s = window.getSelection();
-				} else if (document.getSelection) {
-					s = document.getSelection();
-				} else if (document.selection) {
-					s = document.selection.createRange().text;
-				}
-				return s;
-			}
             var interval;
             var words;
 			if ($("#lightspeed").length == 0) {
-				var s = "";
-				s = getSelText();
-				if (s == "") {
-					var s = prompt("Forget something?");
+				if (text == "") {
+					alert("An error occurred parsing this page.");
 				}
-				if ((s != "") && (s != null)) {
+				if ((text != "") && (text != null)) {
 					$("body").append("\
 					<div id='lightspeed'>\
                         <div id='lightspeed-text'>\
@@ -70,7 +65,7 @@
                     words = [];
                     var regex = /([^\s]+)\s+/g;
                     var matched = null;
-                    while (matched = regex.exec(s)) {
+                    while (matched = regex.exec(text)) {
                       words.push(matched[1]);
                     }                    
 				}
