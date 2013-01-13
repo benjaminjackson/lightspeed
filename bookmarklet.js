@@ -20,74 +20,77 @@
 	}
     
     function initBookmarklet() {
+        createOverlay();
+        var interval;
+        var words;
+        var wpm = prompt("How many WPM? (default: 200)");
+        if (!wpm) { wpm = 200; };
         $.getJSON(api_url + "?token=" + token + "&url=" + encodeURIComponent(window.location) + "&callback=?", function(response) {
-            parseText(response.text);
+            $('div#lightspeed-text').text("Click to Start Reading");
+            words = [];
+            var regex = /([^\s]+)\s+/g;
+            var matched = null;
+            while (matched = regex.exec(response.text)) {
+              words.push(matched[1]);
+            }
+    		if (response.text == "") {
+    			alert("An error occurred parsing this page.");
+    		}
+            else {
+    			$("#lightspeed").click(function(event){
+                    if (interval) {
+                        clearInterval(interval);
+                        interval = null;
+                    }
+                    else {
+                        interval = setInterval(function() {
+                            $('div#lightspeed-text').text(words.shift());
+                        }, 60000/wpm);
+                    }
+                });
+    			$("#lightspeed").dblclick(function(event){
+    				$("#lightspeed").fadeOut(750);
+    				setTimeout("$('#lightspeed').remove()", 750);
+    			});
+            }
         });
     };
 	
-	function parseText(text) {
+	function createOverlay(text) {
 		(window.lightspeed = function() {
-            var interval;
-            var words;
 			if ($("#lightspeed").length == 0) {
-				if (text == "") {
-					alert("An error occurred parsing this page.");
-				}
-				if ((text != "") && (text != null)) {
-					$("body").append("\
-					<div id='lightspeed'>\
-                        <div id='lightspeed-text'>\
-                        Loading...\
-                        </div>\
-						<style type='text/css'>\
-                        div#lightspeed {\
-                            position: fixed;\
-                            top: 0;\
-                            z-index: 100000000000000000000;\
-                            left: 0;\
-                            width: 100%;\
-                            height: 100%;\
-                            background: #fee;\
-                        }\
-                        div#lightspeed-text {\
-                            position:absolute;\
-                            font-size: 96px;\
-                            font-family: Georgia;\
-                            width: 100%;\
-                            height:156px;\
-                            top:50%;\
-                            margin-top:-120px;\
-                            text-align: center;\
-                        }\
-						</style>\
-					</div>");
-					$("#lightspeed").fadeIn(750);
-                    words = [];
-                    var regex = /([^\s]+)\s+/g;
-                    var matched = null;
-                    while (matched = regex.exec(text)) {
-                      words.push(matched[1]);
-                    }                    
-				}
+				$("body").append("\
+				<div id='lightspeed'>\
+                    <div id='lightspeed-text'>\
+                    Loading...\
+                    </div>\
+					<style type='text/css'>\
+                    div#lightspeed {\
+                        position: fixed;\
+                        top: 0;\
+                        z-index: 100000000000000000000;\
+                        left: 0;\
+                        width: 100%;\
+                        height: 100%;\
+                        background: #fee;\
+                    }\
+                    div#lightspeed-text {\
+                        position:absolute;\
+                        font-size: 96px;\
+                        font-family: Georgia;\
+                        width: 100%;\
+                        height:156px;\
+                        top:50%;\
+                        margin-top:-120px;\
+                        text-align: center;\
+                    }\
+					</style>\
+				</div>");
+				$("#lightspeed").fadeIn(750);
 			} else {
 				$("#lightspeed").fadeOut(750);
 				setTimeout("$('#lightspeed').remove()", 750);
 			}
-			$("#lightspeed").click(function(event){
-                if (interval) {
-                    clearInterval(interval);
-                    interval = null;
-                }
-                else {
-                    interval = setInterval(function() {
-                        $('div#lightspeed-text').text(words.shift());
-                    }, 60000/200);
-                }
-            });
-			$("#lightspeed").dblclick(function(event){
-				$("#lightspeed").fadeOut(750);
-				setTimeout("$('#lightspeed').remove()", 750);
-			});
 		})();
 	}
 
